@@ -29,6 +29,7 @@
     }
     return self;
 }
+
 -(void)getRepositoriesWithCompletion:(void (^)(BOOL))completionBlock
 {
     [FISGithubAPIClient getRepositoriesWithCompletion:^(NSArray *repoDictionaries) {
@@ -38,4 +39,25 @@
         completionBlock(YES);
     }];
 }
+
+- (void)toggleStarForRepo:(id)fullName CompletionBlock:(void (^)(BOOL))completionBlock
+{
+    // Check if the repo is starred
+    // if it is starred, unstar it & call back with NO
+    // if it isn't starred, star it & call back with YESS
+    [FISGithubAPIClient checkIfRepoIsStarredWithFullName:fullName CompletionBlock:^(BOOL starred) {
+        if (starred) {
+            [FISGithubAPIClient unstarRepoWithFullName:fullName CompletionBlock:^(BOOL success) {
+                // currently starred, unstar it
+                completionBlock(NO);
+            }];
+        } else {
+            [FISGithubAPIClient starRepoWithFullName:fullName CompletionBlock:^(BOOL success) {
+                // currently unstarred, star it
+                completionBlock(YES);
+            }];
+        }
+    }];
+}
+
 @end
